@@ -5,7 +5,7 @@ app = Flask(__name__) #incijaliziramo instancu Flaska sa argumentom
 @app.route("/") #dekorator ide liniju prije funkcije i govori nam na kojem url-u će se 
 @app.route("/home") #funckija dole brine o dva url. Ima smisla da bude home page u oba slucaja
 # prikazati html kod(funkcija) "/" je homepage
-def home_page():
+def home_page(): # check navbar in base.html za imena funkcija
     return render_template("home.html") # po konvenciji je da se stvori templates folder za sav html kod
 
 @app.route("/market")
