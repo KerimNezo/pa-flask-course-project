@@ -1,0 +1,6 @@
+# ignore all .txt files
+.txt
+
+# Byte-compiled  optimized  DLL files
+__pycache__
+.py[cod]
