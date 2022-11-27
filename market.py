@@ -6,5 +6,8 @@ app = Flask(__name__) #incijaliziramo instancu Flaska sa argumentom
 @app.route("/home") #funckija dole brine o dva url. Ima smisla da bude home page u oba slucaja
 # prikazati html kod(funkcija) "/" je homepage
 def home_page():
-    return render_template('home.html') # po konvenciji je da se stvori templates folder za sav html kod
+    return render_template("home.html") # po konvenciji je da se stvori templates folder za sav html kod
 
+@app.route("/market")
+def market_page():
+    return render_template("market.html")
