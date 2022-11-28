@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Register Page
+{% endblock %}
+
+{% block content %}
+<body class="text-center"> <!-- da centrira komplet div-->
+    <div class="container"> <!-- da sve smjesti skupa i da ne bude od ivide do ivice ekrana-->
+        <form method="POST" class="form-register" style="color:white"> <!-- post metoda, jer korisnik dodaje podatke u bazu -->
+            <img class="mb-4" src="https://res.cloudinary.com/jimshapedcoding/image/upload/v1597332609/android-icon-192x192_ove2a7.png" alt=""> 
+            <h1 class="h3 mb-3 font-weight-normal">
+                Please Create your Account
+            </h1>
+            <br>
+            {{ form.username.label() }} <!-- ovo je label koji smo napisali za svaki atribut klase u froms.py-->
+            {{ form.username(class="form-control", placeholder="User Name") }} <!-- ova naredba prima atribute kao prava html klasa-->
+            
+            {{ form.email_address.label() }}
+            {{ form.email_address(class="form-control", placeholder="Email Address") }}
+            
+            {{ form.password1.label() }}
+            {{ form.password1(class="form-control", placeholder="Password") }}
+            
+            {{ form.password2.label() }}
+            {{ form.password2(class="form-control", placeholder="Confirm Password") }} 
+            
+            <br>
+            {{ form.submit(class="btn btn-lg btn-block btn-primary") }} <!-- daje dugme jer mozemo da importujemo bootstrap atribute za klasu te postaje dugme, smart-->
+        </form>
+    </div>
+</body>
+{% endblock %}
