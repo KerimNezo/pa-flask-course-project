@@ -1,7 +1,7 @@
 from market import app
 from flask import render_template, redirect, url_for, flash #redirect sluzi da usmjeri korisnika na drugu stranicu jer je now logged
 from market.models import Item, User
-from market.forms import RegisterForm
+from market.forms import RegisterForm, LoginForm
 from market import db #db mogu importovati direktno iz marketa jer se db nalazi u dundur fileu __init__
 
 @app.route("/") #dekorator ide liniju prije funkcije i govori nam na kojem url-u će se prikazati 
@@ -25,7 +25,10 @@ def register_page():
         # 2. da je korisnik unio ispravne podatke(radimo to pomocu validacija)
         user_to_create = User(username=form.username.data,
                               email_address=form.email_address.data,
-                              password_hash=form.password1.data)
+                              password=form.password1.data)
+        # stavili smo u User klasi ovdje password umjesto passwrod_hash sto je bilo
+        # jer sada ovaj password moze ici u models.py @password.setter gdje ce se izvrsiti funkcija password
+        
         db.session.add(user_to_create) #dodaje instancu klase koja je primila podatke iz forme
         db.session.commit() # ovo su naredbe koje smo prije rucno u cmd-u unosili da korisnike unesemo
         return redirect(url_for('market_page')) #legit kao u base.html u navbaru objasnjenje, da ne bude hard codirano
@@ -43,3 +46,8 @@ def register_page():
 # za formu nam treba key, koji se nalazi u __init__,py on nam tehnicki daje layer
 # sigurnosti za forme, jer ipak s formama dajemo da ubacuju real podatke u nasu bazu
 # which we need to secure
+
+@app.route("/login", methods=['GET', 'POST'])
+def login_page():
+    form = LoginForm()
+    return render_template('login.html', form=form)

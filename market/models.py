@@ -1,4 +1,5 @@
 from market import db
+from market import bcrypt
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -11,6 +12,15 @@ class User(db.Model):
     # klasicno je da ako zelimo znati iteme od usera, uzmemo usera i vidjet cemo iteme, ali nemozemo isto uraditi obrnuto.
     # da od itema dobijemo ko je njegov user, jer tog nema Item modelu, ali s ovim mozemo 
     # ako ne stavimo lazy = True, SQLAlchemy nece uzezi sve objekte Itema u jednom "shotu?" bitno je tho
+
+    @property #design pattern koji nam dozvoljava da dodamo nove funkcionalnosti na postojeci objekat bez da modifikuje njegovu strukturu
+    def password(self):
+        return self.password
+
+    @password.setter
+    def password(self, plain_text_password):
+        self.password_hash = bcrypt.generate_password_hash(plain_text_password).decode('utf-8')
+    # zbog ovog nam se hashira password u user = User(...), u routes file-, jer se zove tamo password, kao ovdje i dekorator i funkcije (setter mainly)
 
 class Item(db.Model): #buduci da je Item klasa izvedena iz klase Model, to bazi govori da je Item klasa model
     id = db.Column(db.Integer, primary_key=True) #treba pk
