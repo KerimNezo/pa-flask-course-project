@@ -3,6 +3,7 @@ from flask import render_template, redirect, url_for, flash #redirect sluzi da u
 from market.models import Item, User
 from market.forms import RegisterForm, LoginForm
 from market import db #db mogu importovati direktno iz marketa jer se db nalazi u dundur fileu __init__
+from flask_login import login_user
 
 @app.route("/") #dekorator ide liniju prije funkcije i govori nam na kojem url-u će se prikazati 
 @app.route("/home") #funckija dole brine o dva url. Ima smisla da bude home page u oba slucaja
@@ -39,15 +40,25 @@ def register_page():
             # get_flashed_message u base.html prima i kategoriju, odnosno napisali smo u njoj parametar da mozemo biti sa kategorijama
             # zato saljemo category="danger", danger jer bootstrap ima klase tipa danger, skontat ces kad pogledas taj kod u html. ugl salje danger
             # kao varijablu, da se prepozna u klasi i da bootstra dobije dobar opis za klasu
-            # flash builtin funkcija koja je zaduzena za 
-            # meni prikazuje mi errore, ne kao njemu tho, npr meni nece create acc dugme uopste da prode ako imam 1 char u username
-            # ali validacija radi tj ne spasava lose usere u bazu, sto je dobro
+            # flash builtin funkcija je bolji print()?
     return render_template("register.html", form=form)
 # za formu nam treba key, koji se nalazi u __init__,py on nam tehnicki daje layer
 # sigurnosti za forme, jer ipak s formama dajemo da ubacuju real podatke u nasu bazu
 # which we need to secure
 
 @app.route("/login", methods=['GET', 'POST'])
-def login_page():
+def login_page(): #what happens when I press 'sign in' hmm...
     form = LoginForm()
+    if form.validate_on_submit(): # treba provjeriti sada dvije stvari 1. da korisnik postoji 2. da je unio dobru sifru za acc 
+        #return redirect(url_for('market_page'))
+        attempted_user = User.query.filter_by(username=form.username.data).first()
+        if attempted_user and attempted_user.check_password_correction(
+            attempted_password=form.password.data
+        ):
+            login_user(attempted_user)
+            flash(f'Success! You are logged in as: {attempted_user.username}', category='success')
+            return redirect(url_for('market_page'))
+        else:
+            flash('Username and password are not match! Please try again', category='danger')
+
     return render_template('login.html', form=form)
