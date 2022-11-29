@@ -43,6 +43,24 @@
                 </ul>
             </div>
         </nav>
+        <!-- jinja kod koji je zaduzen za prikaz flash poruka, with_categories je za kasnije jer cemo dodavati kategorije errora)-->
+        <!-- messages varijabla sprema u sebe bilo kakve message, a dole if provjerava da je bilo nekih messagea(errora)-->
+        <!-- poruka se na stranici ispisuje kao tupl, tj ('kategorija' npr message,'i onda onaj flash(text) iz routes.py')-->
+        <!-- alert-{{danger}} je za bootstrap, odnosno jer bootstrap ima danger atribut u klasi-->
+        <!-- &times; je da imamo X close button i klasa close u buttonu, data-dismiss i area label su tu da taj X radi svoj posao-->
+        {% with messages = get_flashed_messages(with_categories=true) %} 
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <button type="button" class="m1-2 mb-1 close" data-dismiss="alert" area-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
         {% block content %}
 
         {% endblock %}

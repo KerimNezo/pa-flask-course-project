@@ -1,5 +1,5 @@
 from market import app
-from flask import render_template, redirect, url_for #redirect sluzi da usmjeri korisnika na drugu stranicu jer je now logged
+from flask import render_template, redirect, url_for, flash #redirect sluzi da usmjeri korisnika na drugu stranicu jer je now logged
 from market.models import Item, User
 from market.forms import RegisterForm
 from market import db #db mogu importovati direktno iz marketa jer se db nalazi u dundur fileu __init__
@@ -32,8 +32,13 @@ def register_page():
     #ako neka validacije padne(nije uneseno kako smo napisalo s validacijama) fail ce biti registrovan ovdje
     if form.errors != {}: # ako ima(jer nije prazan) errora od validacije (ljevicaste jer je form.errors dictionary)
         for err_msg in form.errors.values():
-            print(f'There was an error with creating a user: {err_msg}')
-            # meni ne pokazuje errore u cmd-u idk why, ali validacija radi tj ne spasava lose usere u bazu, sto je dobro
+            flash(f'There was an error with creating a user: {err_msg}', category='danger')
+            # get_flashed_message u base.html prima i kategoriju, odnosno napisali smo u njoj parametar da mozemo biti sa kategorijama
+            # zato saljemo category="danger", danger jer bootstrap ima klase tipa danger, skontat ces kad pogledas taj kod u html. ugl salje danger
+            # kao varijablu, da se prepozna u klasi i da bootstra dobije dobar opis za klasu
+            # flash builtin funkcija koja je zaduzena za 
+            # meni prikazuje mi errore, ne kao njemu tho, npr meni nece create acc dugme uopste da prode ako imam 1 char u username
+            # ali validacija radi tj ne spasava lose usere u bazu, sto je dobro
     return render_template("register.html", form=form)
 # za formu nam treba key, koji se nalazi u __init__,py on nam tehnicki daje layer
 # sigurnosti za forme, jer ipak s formama dajemo da ubacuju real podatke u nasu bazu
