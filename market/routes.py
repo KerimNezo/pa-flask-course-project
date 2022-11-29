@@ -3,7 +3,9 @@ from flask import render_template, redirect, url_for, flash #redirect sluzi da u
 from market.models import Item, User
 from market.forms import RegisterForm, LoginForm
 from market import db #db mogu importovati direktno iz marketa jer se db nalazi u dundur fileu __init__
-from flask_login import login_user
+from flask_login import login_user, logout_user, login_required
+# login required nam sluzi da provjeri da li je user logged-in, i u zavisnosti od tog if-a
+# aplikacija ce ga poslati na razlicito mjesto
 
 @app.route("/") #dekorator ide liniju prije funkcije i govori nam na kojem url-u će se prikazati 
 @app.route("/home") #funckija dole brine o dva url. Ima smisla da bude home page u oba slucaja
@@ -11,7 +13,10 @@ from flask_login import login_user
 def home_page(): # check navbar in base.html za imena funkcija
     return render_template("home.html") # po konvenciji je da se stvori templates folder za sav html kod
 
-@app.route("/market")
+@app.route("/market") #ok, idemo na market
+@login_required # but, ali jesi li loged-in ? rjesenjeu __init__ line12, ugl
+# tamo smo nastimali da korisnika posalje na login_page ako on vec nije logged-in a pokusa uci u market
+# line 13 se brine da ne bude ruzno napisan tekst "pls log in to acces", daje mu bootstrap kategoriju, we talked about this man
 def market_page():
     items = Item.query.all() #svi itemi spaseni u bazi
     return render_template("market.html", items=items) #Ovaj podatak dobavljamo putem varijable
@@ -32,6 +37,8 @@ def register_page():
         
         db.session.add(user_to_create) #dodaje instancu klase koja je primila podatke iz forme
         db.session.commit() # ovo su naredbe koje smo prije rucno u cmd-u unosili da korisnike unesemo
+        login_user(user_to_create) #logina usera da skrati posao
+        flash(f"Account created successfully! You are not logged in as {user_to_create.username}", category='success')
         return redirect(url_for('market_page')) #legit kao u base.html u navbaru objasnjenje, da ne bude hard codirano
     #ako neka validacije padne(nije uneseno kako smo napisalo s validacijama) fail ce biti registrovan ovdje
     if form.errors != {}: # ako ima(jer nije prazan) errora od validacije (ljevicaste jer je form.errors dictionary)
@@ -62,3 +69,9 @@ def login_page(): #what happens when I press 'sign in' hmm...
             flash('Username and password are not match! Please try again', category='danger')
 
     return render_template('login.html', form=form)
+
+@app.route("/logout")
+def logout_page():
+    logout_user() #iz flask_login paketa/biblioteke, legit samo logouta
+    flash("You have been logged out!", category='info')
+    return redirect(url_for('home_page'))
