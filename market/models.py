@@ -24,10 +24,12 @@ class User(db.Model, UserMixin):
 
     @property # ovo ce nam ljepse ispisivati novac (stavljat ce zarez iza svake trece cifre)
     def prettier_budget(self):
-        if len(str(self.budget)) >= 4:
-            return f'{str(self.budget)[:-3]},{str(self.budget)[-3:]}$'
+        if self.budget == 0:
+            return f'{self.budget}$ ¯\_༼ ಥ ‿ ಥ ༽_/¯'
+        elif len(str(self.budget)) >= 4:
+            return f'{str(self.budget)[:-3]},{str(self.budget)[-3:]}$ (◕‿◕)'
         else:
-            return f"{self.budget}$"
+            return f"{self.budget}$ (ﾒ﹏ﾒ)"
 
     @property #design pattern koji nam dozvoljava da dodamo nove funkcionalnosti na postojeci objekat bez da modifikuje njegovu strukturu
     def password(self):
@@ -38,8 +40,12 @@ class User(db.Model, UserMixin):
         self.password_hash = bcrypt.generate_password_hash(plain_text_password).decode('utf-8')
     # zbog ovog nam se hashira password u user = User(...), u routes file-, jer se zove tamo password, kao ovdje i dekorator i funkcije (setter mainly)
 
-    def check_password_correction(self, attempted_password): 
-        return bcrypt.check_password_hash(self.password_hash, attempted_password)
+    def check_password_correction(self, attempted_password): #provjeravamo da li je unesena sifra jednaka sifri tog korisnika u bazi
+        return bcrypt.check_password_hash(self.password_hash, attempted_password) # built-in funkcija koja provjerava da 
+        # li se podudaraju hashirana sifra i string sifra
+
+    def can_purchase(self, item_obj):
+        return self.budget >= item_obj.price #vraca true/false i govori tehnicki da li korisnik MOZE/NEMOZE kupiti item
 
 # ovdje parametar a_pass je ono sto unesemo u login
 # provjerava da li je raw string koji smo unijeli na loginu u polje sifra
@@ -62,3 +68,10 @@ class Item(db.Model): #buduci da je Item klasa izvedena iz klase Model, to bazi 
 
     def __repr__(self):
         return f'Item {self.name}' # ovo je samo za konzolni ispis Item.query.all()
+
+    def buy(self, user):
+        self.owner = user.id #kaze da je sad item korisnikov
+        # .owner je column iz tabele Item, koja sluzi da se pokaze da item ima vlasnika
+        # current_user.id kupi id od korisnika koji je trenutno logged in
+        user.budget -= self.price #oduzima korisniku kesh
+        db.session.commit() # baza se updatea

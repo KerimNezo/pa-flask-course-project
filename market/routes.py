@@ -1,9 +1,10 @@
 from market import app
-from flask import render_template, redirect, url_for, flash #redirect sluzi da usmjeri korisnika na drugu stranicu jer je now logged
+from flask import render_template, redirect, url_for, flash, request #redirect sluzi da usmjeri korisnika na drugu stranicu jer je now logged
 from market.models import Item, User
-from market.forms import RegisterForm, LoginForm
+from market.forms import RegisterForm, LoginForm, PurchaseItemForm
 from market import db #db mogu importovati direktno iz marketa jer se db nalazi u dundur fileu __init__
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
+# current_user je built-in objekat koji nam govori valjda koji je trenutni user logged in0
 # login required nam sluzi da provjeri da li je user logged-in, i u zavisnosti od tog if-a
 # aplikacija ce ga poslati na razlicito mjesto
 
@@ -13,14 +14,29 @@ from flask_login import login_user, logout_user, login_required
 def home_page(): # check navbar in base.html za imena funkcija
     return render_template("home.html") # po konvenciji je da se stvori templates folder za sav html kod
 
-@app.route("/market") #ok, idemo na market
+@app.route("/market", methods=['GET','POST']) #ok, idemo na market
 @login_required # but, ali jesi li loged-in ? rjesenjeu __init__ line12, ugl
 # tamo smo nastimali da korisnika posalje na login_page ako on vec nije logged-in a pokusa uci u market
 # line 13 se brine da ne bude ruzno napisan tekst "pls log in to acces", daje mu bootstrap kategoriju, we talked about this man
 def market_page():
-    items = Item.query.all() #svi itemi spaseni u bazi
-    return render_template("market.html", items=items) #Ovaj podatak dobavljamo putem varijable
-    # {{ item_name }}
+    purchase_form = PurchaseItemForm() #ovdje se obavlja kupovina
+    if request.method == "POST": # radi isto kao validate on submit
+        purchased_item = request.form.get('purchased_item') # ova varijabla sada dobija naziv itema koji smo kupili
+        p_item_object = Item.query.filter_by(name=purchased_item).first()
+        if p_item_object: #ako postoji
+            if current_user.can_purchase(p_item_object): #provjerava da li korisnika ima $$ da kupi item
+                p_item_object.buy(current_user) # vrsi kupovinu.Nalazi se u Item modelu
+                flash(f"Congratulashions! You purchased {p_item_object.name} for {p_item_object.price}$", category='success')
+            else:
+                flash(f"Unfortunately, you don't have enough money to purchase {p_item_object.name}!", category='danger')
+        
+        return redirect(url_for('market_page'))
+
+    if request.method == "GET": 
+        # ovo smo dodatno napisali da nemamo confirm resubmision output koji vidimo na svakom reload-u stranice
+        items = Item.query.filter_by(owner=None) # lista sve iteme spaseni u bazi
+        return render_template("market.html", items=items, purchase_form=purchase_form)
+        # ove podatke, items i purchase_form saljemo u market.html da se mogu koristiti
 
 @app.route("/register", methods=['GET', 'POST'])# ovu listu ubacujemo da nasa ruta moze handlat post i get metode
 def register_page():

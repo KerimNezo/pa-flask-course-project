@@ -49,14 +49,27 @@
                 </h5>
                 <button type="button" class="close"
                         data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true" style="color:antiquewhite">x</span>
+                  <span aria-hidden="true">x</span>
                   <!-- dodao sam ovdje obicno slovo i ovu boju jer njegovo nisam mogao naci da prekucam
                         jer nema ovog koda na gitu mu-->
                 </button>
             </div>
             <div class="modal-body">
                 <!-- Here goes the text/paragraph -->
-                Are you sure you want to buy {{ item.name }} for {{ item.price }}$ ?
+                <form method="POST">
+                    {{ purchase_form.hidden_tag() }}
+                    <h4 class="text-center">
+                        Are you sure you want to buy {{ item.name }} for {{ item.price }}$ ?
+                    </h4>
+                    <br>
+                    <h6 class="text-center">
+                        By clicking Purchase, you will purchase this item.
+                    </h6>
+                    <br>
+                    <input id="purchased_item" name="purchased_item" type="hidden" value="{{item.name}}">
+                    {{ purchase_form.submit(class="btn btn-outline-success btn-block") }}
+                </form>
+                <!-- da bi obavili post metodu moramo dodati hidden_tag() to je secure tag-->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary"
