@@ -1,0 +1,49 @@
+<style>
+    .modal-content {
+        background-color: #212121;
+    }
+</style>
+
+<!-- Selling Confirmation Modal -->
+<div class="modal fade" id="Modal-SellingConfirm-{{ owned_item.id }}"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalLabel">
+                    <!-- -->
+                    {{ owned_item.name }}
+                </h5>
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">x</span>
+                  <!-- dodao sam ovdje obicno slovo i ovu boju jer njegovo nisam mogao naci da prekucam
+                        jer nema ovog koda na gitu mu-->
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Here goes the text/paragraph -->
+                <form method="POST">
+                    {{ selling_form.hidden_tag() }}
+                    <h4 class="text-center">
+                        Are you sure you want to sell {{ owned_item.name }} for {{ owned_item.price }}$ ?
+                    </h4>
+                    <br>
+                    <h6 class="text-center">
+                        By clicking Sell, you will put this item back on market
+                    </h6>
+                    <br>
+                    <input id="sold_item" name="sold_item" type="hidden" value="{{ owned_item.name }}">
+                    {{ selling_form.submit(class="btn btn-outline-danger btn-block") }}
+                </form>
+                <!-- da bi obavili post metodu moramo dodati hidden_tag() to je secure tag-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                        data-dismiss="modal">Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

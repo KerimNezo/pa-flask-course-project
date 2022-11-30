@@ -26,8 +26,10 @@ class User(db.Model, UserMixin):
     def prettier_budget(self):
         if self.budget == 0:
             return f'{self.budget}$ ¯\_༼ ಥ ‿ ಥ ༽_/¯'
-        elif len(str(self.budget)) >= 4:
+        elif len(str(self.budget)) == 4:
             return f'{str(self.budget)[:-3]},{str(self.budget)[-3:]}$ (◕‿◕)'
+        elif len(str(self.budget)) >=5:
+            return f'{str(self.budget)[:-3]},{str(self.budget)[-3:]}$ (⊙_⊙)ヽ(°〇°)ﾉ'
         else:
             return f"{self.budget}$ (ﾒ﹏ﾒ)"
 
@@ -46,6 +48,9 @@ class User(db.Model, UserMixin):
 
     def can_purchase(self, item_obj):
         return self.budget >= item_obj.price #vraca true/false i govori tehnicki da li korisnik MOZE/NEMOZE kupiti item
+
+    def can_sell(self, item_obj): #provjerava da li korisnik posjeduje taj item
+        return item_obj in self.items # provjerava da li item postoji i u bazi
 
 # ovdje parametar a_pass je ono sto unesemo u login
 # provjerava da li je raw string koji smo unijeli na loginu u polje sifra
@@ -74,4 +79,9 @@ class Item(db.Model): #buduci da je Item klasa izvedena iz klase Model, to bazi 
         # .owner je column iz tabele Item, koja sluzi da se pokaze da item ima vlasnika
         # current_user.id kupi id od korisnika koji je trenutno logged in
         user.budget -= self.price #oduzima korisniku kesh
+        db.session.commit() # baza se updatea
+
+    def sell(self, user):
+        self.owner = None #vracamo da item nema vlasnika
+        user.budget += self.price # prodao je item, te je dobio $$
         db.session.commit() # baza se updatea
