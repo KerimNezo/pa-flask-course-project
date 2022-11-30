@@ -8,7 +8,7 @@ Python 3.11.0
 Flask 2.2.2
 Werkzeug 2.2.2
 
-paketi:
+paketi: (idi na raw za bolji listing paketa)
 Package               Version
 --------------------- ---------
 bcrypt                4.0.1
