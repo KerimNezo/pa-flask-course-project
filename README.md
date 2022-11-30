@@ -3,7 +3,8 @@ Projekat na kraju Flask Course videa
 
 
 Male upute sebi da mogu runat ovo
-verzije:
+
+Verzije:
 Python 3.11.0
 Flask 2.2.2
 Werkzeug 2.2.2
