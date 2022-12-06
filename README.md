@@ -20,11 +20,11 @@ Link to video tutorial that was followed while creating this project: https://ww
 
 Da bi instalirali requirements.txt stuff, treba nam venv, njemu je lakse onda fercerat.
 Check if you have virtualenv
-  which virtualenv
+  - which virtualenv
 If no, enter the following in your terminal to install it.
-  pip install virtualenv
+  - pip install virtualenv
 To create a virtual environment in the current directory:
-  virtualenv <my_env_name>
+  - virtualenv <my_env_name>
 
 For virtualenv to install all files in the requirements.txt file.
 
